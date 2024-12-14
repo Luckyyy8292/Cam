@@ -1,0 +1,39 @@
+import cv2
+import numpy as np
+import dlib
+from PIL import Image
+
+# Load pre-trained face detector from dlib
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+
+def apply_beauty_effect(image):
+    # Convert image to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Detect faces in the image
+    faces = detector(gray)
+    
+    # Apply smoothing effect
+    smoothed_image = cv2.GaussianBlur(image, (21, 21), 0)
+    
+    # Revert to original image where faces are detected for highlighting
+    for face in faces:
+        (x, y, w, h) = (face.left(), face.top(), face.width(), face.height())
+        # Draw a rectangle around the face (you can customize this to do something else like brightening eyes)
+        cv2.rectangle(smoothed_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    return smoothed_image
+
+# Load image from file or webcam
+image = cv2.imread('input.jpg')  # Use the path to your image or capture from webcam
+beautified_image = apply_beauty_effect(image)
+
+# Show the beautified image
+cv2.imshow('Beauty Cam', beautified_image)
+
+# Save the output
+cv2.imwrite('beauty_output.jpg', beautified_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
